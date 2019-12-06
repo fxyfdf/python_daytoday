@@ -1,0 +1,56 @@
+
+images_names=(meta-mg meta-query right-mg right-query)
+harbor_old="dsp.images.hub:11180"
+harbor_new="harbor.internal-bigdata.com"
+project_old="kbdp"
+project_new="yxy"
+
+tag_old="vuat1030"
+tag_new="v1030"
+# docker login lod new harbor
+pull(){
+for image_name in ${images_names[@]}
+do
+echo $image_name
+docker pull ${harbor_old}//${project_old}/${image_name}:${tag_old}
+done
+}
+
+push() {
+for image_name in ${images_names[@]}
+do
+echo $image_name
+docker push ${harbor_new}/${project_new}/${image_name}:${tag_new}
+done
+}
+
+tag() {
+for image_name in ${images_names[@]}
+do
+echo $image_name
+
+echo docker tag  ${harbor_old}/${project_old}/${image_name}:${tag_old} ${harbor_new}/${project_new}/${image_name}:${tag_new}
+#docker tag ${harbor_old}/${project_old}/${image_name}:${tag_old} ${harbor_new}/${project_new}/${image_name}:${tag_new}
+done
+}
+
+save(){
+all_image=`
+for image_name in ${images_names[@]}
+do
+echo "${harbor_new}/${project_new}/${image_name}:${tag_new}"
+done  | tr "\n" " "   `
+echo ${all_image}
+docker save ${all_image} > ${project_new}.tar
+}
+
+laod() {
+docker load < ${project_new}.tar
+}
+
+
+#pull
+#push
+#tag
+save
+#load
