@@ -7,6 +7,7 @@
     <orderEntry type="module" module-name="LearnPython" />
     <orderEntry type="module" module-name="Python-100-Days" />
     <orderEntry type="module" module-name="LearnPython1" />
+    <orderEntry type="module" module-name="kubernetes-handbook" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="pytest" />
