@@ -1,0 +1,23 @@
+参考：
+https://www.jb51.net/article/168851.htm
+
+#python2
+import Image
+#python3（因为是派生的PIL库，所以要导入PIL中的Image）
+from PIL import Image
+
+# python3
+from PIL import Image
+im = Image.open("1.png")
+# 查看图片
+im.show()
+
+
+
+im.save("c:\\")
+
+# 屏幕截图
+from PIL import ImageGrab
+im = ImageGrab.grab((0,0,800,200)) #截取屏幕指定区域的图像
+im = ImageGrab.grab() #不带参数表示全屏幕截图
+im.save("C:\\Users\\Administrator\\Desktop\\GO_IMAGE\\1.png")
