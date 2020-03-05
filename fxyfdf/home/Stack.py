@@ -23,3 +23,13 @@ class Stack:
     def peek(self):
         return self.stack[0]
 
+
+if __name__ == '__main__' :
+    AStack = Stack()
+    AStack.add("Mon")
+    AStack.add("Tue")
+    AStack.peek()
+    print(AStack.peek())
+    AStack.add("Wed")
+    AStack.add("Thu")
+    print(AStack.peek())
