@@ -1,0 +1,276 @@
+# my global config
+global:
+  scrape_interval:     1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+   - "rules_k8s_es.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'elasticsearch'
+    scrape_interval: 60s
+    static_configs:
+    - targets: ['10.209.33.68:9114']
+      labels:
+        tag: 'ops'   
+    - targets: ['10.209.32.188:9114']
+      labels:
+        tag: 'ops'  
+    - targets: ['10.209.32.250:9114']
+      labels:
+        tag: 'ops'
+    - targets: ['10.209.33.133:9114']
+      labels:
+        tag: 'ops'
+    - targets: ['10.209.32.97:9114']
+      labels:
+        tag: 'share'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+    - source_labels: ['up']
+      target_label: exporter_up
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (elasticsearch_os_load1|elasticsearch_indices_search_query_total|elasticsearch_indices_search_query_time_seconds|elasticsearch_thread_pool_active_count|elasticsearch_thread_pool_queue_count|elasticsearch_thread_pool_rejected_count|elasticsearch_process_cpu_percent|elasticsearch_transport_rx_packets_total|elasticsearch_transport_tx_packets_total|elasticsearch_os_cpu_percent|elasticsearch_os_load1|elasticsearch_os_load5|elasticsearch_os_mem_free_bytes|elasticsearch_os_mem_used_bytes|elasticsearch_filesystem_data_size_bytes|elasticsearch_filesystem_data_available_bytes|elasticsearch_cluster_health_active_shards|elasticsearch_cluster_health_number_of_nodes|elasticsearch_cluster_health_number_of_data_nodes|elasticsearch_cluster_health_number_of_pending_tasks|elasticsearch_cluster_health_status|elasticsearch_cluster_health_active_primary_shards|elasticsearch_cluster_health_initializing_shards|elasticsearch_cluster_health_relocating_shards|elasticsearch_cluster_health_unassigned_shards|elasticsearch_jvm_gc_collection_seconds_count|elasticsearch_jvm_memory_used_bytes|elasticsearch_indices_search_fetch_time_seconds|elasticsearch_indices_search_fetch_total|elasticsearch_indices_search_scroll_total|elasticsearch_indices_search_scroll_time_seconds|elasticsearch_filesystem_io_stats_device_read_size_kilobytes_sum|elasticsearch_filesystem_io_stats_device_write_size_kilobytes_sum|elasticsearch_filesystem_io_stats_device_read_operations_count|elasticsearch_filesystem_io_stats_device_write_operations_count)
+      action: keep
+  - job_name: 'zookeeper'
+    scrape_interval: 60s
+    static_configs:
+    - targets: ['10.209.32.176:9141']
+      labels:
+        tag: 'ops'
+    - targets: ['10.209.64.9:9141']
+      labels:
+        tag: 'base'
+        env: 'online'
+    - targets: ['10.209.96.11:9141']
+      labels:
+        tag: 'base'
+        env: 'offline'
+    - targets: ['10.209.32.155:9141']
+      labels:
+        tag: 'dts'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (zk_znode_count|zk_num_alive_connections|zk_packets_sent|zk_znode_count|zk_approximate_data_size|zk_max_latency|zk_open_file_descriptor_count|zk_synced_followers|zk_followers|zk_packets_received|zk_watch_count|zk_min_latency|zk_avg_latency|zk_max_file_descriptor_count)
+      action: keep
+  - job_name: 'mysql'
+    scrape_interval: 1m
+    static_configs:
+    - targets: ["10.209.33.13:9100","10.209.33.113:9100","10.209.33.175:9100"]
+      labels:
+        tag: 'share'
+    - targets: ["10.209.32.71:9100","10.209.32.177:9100","10.209.32.187:9100"]
+      labels:
+        tag: 'ds'
+    - targets: ["10.209.32.65:9100","10.209.32.233:9100","10.209.33.17:9100"]
+      labels:
+        tag: 'dsp'
+    - targets: ["10.209.33.141:9100","10.209.33.19:9100","10.209.33.37:9100"]
+      labels:
+        tag: 'dts'
+    - targets: ["10.209.33.29:9100","10.209.33.169:9100","10.209.32.222:9100"]
+      labels:
+        tag: 'base'
+    - targets: ["10.209.32.254:9100","10.209.33.69:9100","10.209.33.6:9100"]
+      labels:
+        tag: 'ops'
+    - targets: ["10.209.32.146:9100","10.209.33.118:9100","10.209.32.237:9100"]
+      labels:
+        tag: 'op'  
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (mysql_*|up).*
+      action: keep
+    
+    #metric_relabel_configs:
+    #- source_labels: [__name__]
+    #  regex: (mysql_global_status_threads_running|mysql_global_status_threads_connected|mysql_global_status_uptime|mysql_global_status_queries)
+    #  action: keep 
+  - job_name: 'rocketmq'
+    scrape_interval: 60s
+    static_configs:
+    - targets: ['10.209.33.97:5557','10.209.33.134:5557']
+      labels:
+        tag: 'share'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+  - job_name: 'redis'
+    scrape_interval: 60s
+    static_configs:
+    - targets: ['10.209.32.88:9121']
+      labels:
+        tag: 'share'
+    - targets: ['10.209.32.172:9121']
+      labels:
+        tag: 'dts'
+    - targets: ['10.209.32.162:9121']
+      labels:
+        tag: 'ops'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (redis_memory_used_bytes|redis_commands_total|redis_memory_used_bytes|redis_net_input_bytes_total|redis_db_keys|redis_uptime_in_seconds|redis_keyspace_hits_per_min|redis_commands_per_min|redis_connected_clients|redis_blocked_clients|redis_rejected_connections_total|redis_net_output_bytes_total|redis_keyspace_misses_per_min|redis_up)
+      action: keep
+  - job_name: 'hybird-exporter'
+    scrape_interval: 1m
+    scrape_timeout: 30s
+    metrics_path: '/hybird_metrics'
+    static_configs:
+    - targets: ["10.209.32.9:9099","10.209.32.12:9099"]
+      labels:
+        tag: 'dd'
+    - targets: ["10.209.32.106:9099","10.209.32.105:9099","10.209.32.138:9099","10.209.32.99:9099"]
+      labels:
+        tag: 'common'
+    - targets: ["10.209.32.84:9099","10.209.32.141:9099"]
+      labels:
+        tag: 'dg'
+    - targets: ["10.209.32.4:9099","10.209.32.44:9099","10.209.32.6:9099","10.209.32.2:9099","10.209.32.8:9099"]
+      labels:
+        tag: 'dsp'
+    - targets: ["10.209.35.131:9099","10.209.33.214:9099","10.209.35.206:9099","10.209.35.68:9099"]
+      labels:
+        tag: 'dmg'
+    - targets: ["10.209.32.48:9099","10.209.32.20:9099"]
+      labels:
+        tag: 'visualization'
+    - targets: ["10.209.32.5:9099","10.209.32.17:9099"]
+      labels:
+        tag: 'ds'
+    - targets: ["10.209.32.140:9099","10.209.32.139:9099","10.209.32.118:9099","10.209.32.51:9099","10.209.32.83:9099","10.209.32.90:9099","10.209.32.113:9099","10.209.32.124:9099","10.209.32.80:9099","10.209.32.86:9099","10.209.32.135:9099","10.209.32.60:9099","10.209.32.102:9099","10.209.32.172:9099","10.209.33.0:9099","10.209.33.45:9099","10.209.33.102:9099","10.209.33.144:9099","10.209.33.117:9099","10.209.33.100:9099","10.209.32.155:9099","10.209.32.178:9099","10.209.32.215:9099","10.209.33.43:9099"]
+      labels:
+        tag: 'dts'
+    - targets: ["10.209.64.10:9099","10.209.64.3:9099","10.209.64.13:9099","10.209.64.12:9099","10.209.64.9:9099","10.209.64.8:9099","10.209.64.5:9099"]
+      labels:
+        tag: 'base'
+        env: 'online'
+        group: 'kde'
+    - targets: ["10.209.96.4:9099","10.209.96.16:9099","10.209.96.11:9099","10.209.96.8:9099","10.209.96.15:9099","10.209.96.12:9099"]
+      labels:
+        tag: 'base'
+        env: 'offline'
+        group: 'kde'
+    - targets: ["10.209.32.103:9098","10.209.32.121:9098","10.209.32.136:9098","10.209.32.137:9098","10.209.32.62:9098","10.209.32.69:9098","10.209.34.78:9098","10.209.36.182:9098","10.209.36.199:9098","10.209.36.67:9098"]
+      labels:
+        tag: 'base'
+        env: 'online'
+        group: 'k8s'
+    - targets: ["10.209.0.12:9098","10.209.0.13:9098","10.209.0.15:9098","10.209.0.16:9098","10.209.0.5:9098","10.209.0.6:9098","10.209.0.7:9098","10.209.0.8:9098","10.209.0.9:9098"]
+      labels:
+        tag: 'base'
+        env: 'offline'
+        group: 'k8s'
+    - targets: ["10.209.32.226:9098","10.209.33.145:9098","10.209.33.170:9098","10.209.33.216:9098","10.209.33.24:9098","10.209.33.249:9098","10.209.34.111:9098","10.209.34.145:9098","10.209.34.184:9098","10.209.34.187:9098","10.209.34.75:9098","10.209.35.123:9098","10.209.35.137:9098","10.209.35.142:9098","10.209.35.151:9098","10.209.35.172:9098","10.209.35.178:9098","10.209.35.193:9098","10.209.35.249:9098","10.209.35.39:9098","10.209.35.51:9098","10.209.35.71:9098","10.209.36.106:9098","10.209.36.205:9098","10.209.36.212:9098","10.209.36.53:9098","10.209.36.74:9098"]
+      labels:
+        tag: 'base'
+        group: 'endpoints'
+    - targets: ["10.209.33.13:9099","10.209.33.113:9099","10.209.33.175:9099","10.209.32.71:9099","10.209.32.177:9099","10.209.32.187:9099","10.209.32.65:9099","10.209.32.233:9099","10.209.33.17:9099","10.209.33.141:9099","10.209.33.19:9099","10.209.33.37:9099","10.209.33.29:9099","10.209.33.169:9099","10.209.32.222:9099","10.209.32.254:9099","10.209.33.69:9099","10.209.33.6:9099","10.209.32.146:9099","10.209.33.118:9099","10.209.32.237:9099"]
+      labels:
+        tag: 'base'
+        group: 'mysql'
+    - targets: ['10.209.32.24:9099', '10.209.32.38:9099', '10.209.32.43:9099', '10.209.32.125:9099', '10.209.32.68:9099', '10.209.32.47:9099', '10.209.32.46:9099', '10.209.32.26:9099', '10.209.32.30:9099', '10.209.32.31:9099', '10.209.33.10:9099', '10.209.32.104:9099', '10.209.33.110:9099', '10.209.32.182:9099', '10.209.33.67:9099', '10.209.32.225:9099', '10.209.32.170:9099', '10.209.32.50:9099', '10.209.32.168:9099', '10.209.32.219:9099', '10.209.32.197:9099', '10.209.32.150:9099', '10.209.33.161:9099', '10.209.33.46:9099', '10.209.32.45:9099', '10.209.32.29:9099', '10.209.33.38:9099', '10.209.32.7:9099', '10.209.33.18:9099', '10.209.33.167:9099', '10.209.32.100:9099', '10.209.32.134:9099', '10.209.32.37:9099', '10.209.32.27:9099', '10.209.32.227:9099', '10.209.32.81:9099', '10.209.32.34:9099', '10.209.32.22:9099', '10.209.32.33:9099', '10.209.32.18:9099', '10.209.32.120:9099', '10.209.32.122:9099', '10.209.33.44:9099', '10.209.33.140:9099', '10.209.32.152:9099', '10.209.32.126:9099', '10.209.32.78:9099', '10.209.32.28:9099', '10.209.32.111:9099', '10.209.32.142:9099', '10.209.32.130:9099', '10.209.32.72:9099', '10.209.32.61:9099', '10.209.32.127:9099', '10.209.32.66:9099', '10.209.32.131:9099', '10.209.32.49:9099', '10.209.32.21:9099', '10.209.32.42:9099', '10.209.32.41:9099', '10.209.32.247:9099', '10.209.32.185:9099', '10.209.33.112:9099', '10.209.33.159:9099']
+      labels:
+        tag: 'op'
+    - targets: ["10.209.33.68:9099","10.209.33.63:9099","10.209.33.30:9099","10.209.33.16:9099","10.209.33.21:9099","10.209.33.119:9099","10.209.32.218:9099","10.209.32.250:9099","10.209.33.88:9099","10.209.33.70:9099","10.209.32.221:9099","10.209.33.71:9099","10.209.33.149:9099","10.209.33.64:9099","10.209.32.188:9099","10.209.32.167:9099","10.209.32.156:9099","10.209.33.61:9099","10.209.33.79:9099","10.209.33.33:9099","10.209.32.220:9099","10.209.33.133:9099","10.209.32.194:9099","10.209.33.11:9099","10.209.32.148:9099","10.209.33.42:9099","10.209.33.85:9099","10.209.33.96:9099","10.209.33.124:9099","10.209.33.106:9099","10.209.33.131:9099","10.209.33.81:9099","10.209.32.151:9099","10.209.33.173:9099","10.209.32.162:9099","10.209.32.229:9099","10.209.33.155:9099","10.209.33.99:9099","10.209.33.109:9099","10.209.32.176:9099","10.209.32.149:9099","10.209.33.130:9099","10.209.32.165:9099","10.209.32.234:9099","10.209.32.191:9099","10.209.33.83:9099","10.209.33.126:9099","10.209.32.243:9099","10.209.32.212:9099","10.209.33.23:9099","10.209.32.169:9099","10.209.33.50:9099","10.209.33.97:9099","10.209.33.134:9099"]
+      labels:
+        tag: 'ops'
+    - targets: ["10.209.32.110:9099","10.209.33.26:9099","10.209.23.3:9099","10.209.23.9:9099","10.209.23.17:9099","10.209.23.8:9099","10.209.23.7:9099","10.209.23.4:9099","10.209.22.7:9099","10.209.22.5:9099","10.209.22.16:9099","10.209.22.3:9099","10.209.22.17:9099","10.209.22.4:9099","10.209.32.123:9099","10.209.32.112:9099","10.209.32.99:9099","10.209.32.138:9099","10.209.32.106:9099","10.209.32.105:9099","10.209.23.16:9099","10.209.23.12:9099"]
+      labels:
+        tag: 'platform'
+    - targets: ["10.209.32.129:9099","10.209.32.79:9099","10.209.32.98:9099","10.209.32.70:9099","10.209.32.96:9099","10.209.32.108:9099","10.209.32.89:9099","10.209.32.85:9099","10.209.32.57:9099","10.209.32.88:9099","10.209.32.64:9099","10.209.32.144:9099","10.209.32.97:9099","10.209.32.93:9099","10.209.32.77:9099","10.209.32.67:9099","10.209.32.92:9099","10.209.32.87:9099","10.209.32.145:9099","10.209.32.119:9099","10.209.32.133:9099","10.209.32.109:9099","10.209.32.73:9099","10.209.32.116:9099"]
+      labels:
+        tag: 'share'
+    - targets: ["10.209.32.32:9099","10.209.32.23:9099"]
+      labels:
+        tag: 'streaming'   
+    - targets: ["10.209.32.205:9099","10.209.33.164:9099"]
+      labels:
+        tag: 'test'    
+    - targets: ["10.209.32.48:9099","10.209.32.20:9099"]
+      labels:
+        tag: 'visualization'                                                 
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: "([^:]+):\\d+"
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (cpu_used_ratio|mem_used_ratio|disk_partition_used_ratio|disk_inode_usage_ratio|net_in_bytes|net_out_bytes|load_1min|load_5min|up|process_pid).*
+      action: keep
+  - job_name: 'federate_kmr'
+    honor_labels: true
+    honor_timestamps: true
+    params:
+      'match[]':
+       - '{job="kmr"}'
+       #- '{job="kmr-proxy"}'
+       #- '{job="kmr-mysql"}'
+       #- '{job="kmr-ssh-tunnel"}'
+       #- '{job="kmr-operation"}'
+       #- '{job="kmr-account"}'
+       - '{job="kmr-clusters"}'
+    scrape_interval: 60s
+    scrape_timeout: 10s
+    metrics_path: /prometheus/federate
+    scheme: http
+    static_configs:
+    - targets:
+      - 10.209.33.2:9090
+  - job_name: 'federate_k8s'
+    scrape_interval: 1m
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+       - '{job="kubernetes-service-endpoints"}'
+       #- '{job="kubernetes-pods"}'
+       - '{job="kubernetes-nodes-cadvisor"}'
+    static_configs: 
+     - targets: ['prometheus-offline.internal-bigdata.com']
+       labels:
+         env: 'offline'
+     - targets: ['prometheus-online.internal-bigdata.com']
+       labels:
+         env: 'online'
+     - targets: ['prometheus-endpoint.internal-bigdata.com']
+       labels:
+         env: 'endpoint'
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: (kube_pod_container_status_running|container_cpu_usage_seconds_total|container_memory_working_set_bytes|kube_pod_container_resource_limits_memory_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total)
+      action: keep 
+remote_write:
+  - url: "http://10.209.33.50:8201/write"
+    queue_config:
+      max_samples_per_send: 2000
+    basic_auth:
+      username: prometheus
+      password: prometheus@123
