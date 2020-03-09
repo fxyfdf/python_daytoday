@@ -25,11 +25,13 @@ class Stack:
 
 
 if __name__ == '__main__' :
+    #  只打印栈顶
     AStack = Stack()
-    AStack.add("Mon")
-    AStack.add("Tue")
+    AStack.add("A")
+    AStack.add("B")
     AStack.peek()
     print(AStack.peek())
-    AStack.add("Wed")
-    AStack.add("Thu")
+    AStack.add("C")
+    AStack.add("D")
+    print(AStack.peek())
     print(AStack.peek())

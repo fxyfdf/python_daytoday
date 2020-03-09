@@ -13,14 +13,14 @@ class Stack:
         self.stack = []
 
     def add(self, dataval):
-# Use list append method to add element
+    # Use list append method to add element
         if dataval not in self.stack:
             self.stack.append(dataval)
             return True
         else:
             return False
 
-# Use list pop method to remove element
+    # Use list pop method to remove element
     def remove(self):
         if len(self.stack) <= 0:
             return ("No element in the Stack")
@@ -29,9 +29,10 @@ class Stack:
 
 if __name__ == '__main__' :
     AStack = Stack()
-    AStack.add("Mon")
-    AStack.add("Tue")
+    AStack.add('A')
+    AStack.add("B")
     print(AStack.remove())
-    AStack.add("Wed")
-    AStack.add("Thu")
+    print(AStack.remove())
+    AStack.add("C")
+    AStack.add("D")
     print(AStack.remove())
